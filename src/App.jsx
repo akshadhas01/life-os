@@ -1,17 +1,67 @@
+import { useEffect, useState } from "react";
+
 function App() {
+  const [tasks, setTasks] = useState([]);
+  const [input, setInput] = useState("");
+
+  useEffect(() => {
+    const savedTasks = localStorage.getItem("lifeos-tasks");
+
+    if (savedTasks) {
+      setTasks(JSON.parse(savedTasks));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("lifeos-tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
+  const addTask = () => {
+    if (!input.trim()) return;
+
+    setTasks([
+      ...tasks,
+      {
+        id: Date.now(),
+        text: input,
+        completed: false,
+      },
+    ]);
+
+    setInput("");
+  };
+
+  const toggleTask = (id) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id
+          ? { ...task, completed: !task.completed }
+          : task
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
+
+  const completedTasks = tasks.filter(
+    (task) => task.completed
+  ).length;
+
   return (
     <div
       style={{
         display: "flex",
         height: "100vh",
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "Arial",
       }}
     >
       {/* Sidebar */}
       <div
         style={{
           width: "250px",
-          backgroundColor: "#1f2937",
+          background: "#1f2937",
           color: "white",
           padding: "20px",
         }}
@@ -27,55 +77,100 @@ function App() {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main Area */}
       <div
         style={{
           flex: 1,
           padding: "30px",
-          backgroundColor: "#f3f4f6",
+          background: "#f3f4f6",
         }}
       >
-        <h1>Dashboard</h1>
-        <p>Welcome back to Life OS.</p>
+        <h1>Task Manager</h1>
 
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "20px",
-            marginTop: "30px",
+            display: "flex",
+            gap: "10px",
+            marginTop: "20px",
           }}
         >
-          <div style={cardStyle}>
-            <h3>Tasks</h3>
-            <p>0 Tasks</p>
-          </div>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Add a task..."
+            style={{
+              padding: "10px",
+              flex: 1,
+            }}
+          />
 
-          <div style={cardStyle}>
-            <h3>Habits</h3>
-            <p>0 Completed</p>
-          </div>
+          <button
+            onClick={addTask}
+            style={{
+              padding: "10px 20px",
+              cursor: "pointer",
+            }}
+          >
+            Add
+          </button>
+        </div>
 
-          <div style={cardStyle}>
-            <h3>Goals</h3>
-            <p>0 Active Goals</p>
-          </div>
+        <div
+          style={{
+            marginTop: "20px",
+            background: "white",
+            padding: "20px",
+            borderRadius: "12px",
+          }}
+        >
+          <h3>Total Tasks: {tasks.length}</h3>
+          <h3>Completed: {completedTasks}</h3>
+        </div>
 
-          <div style={cardStyle}>
-            <h3>Notes</h3>
-            <p>0 Notes</p>
-          </div>
+        <div style={{ marginTop: "20px" }}>
+          {tasks.map((task) => (
+            <div
+              key={task.id}
+              style={{
+                background: "white",
+                padding: "15px",
+                marginBottom: "10px",
+                borderRadius: "10px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => toggleTask(task.id)}
+                />
+
+                <span
+                  style={{
+                    marginLeft: "10px",
+                    textDecoration: task.completed
+                      ? "line-through"
+                      : "none",
+                  }}
+                >
+                  {task.text}
+                </span>
+              </div>
+
+              <button
+                onClick={() => deleteTask(task.id)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
-
-const cardStyle = {
-  background: "white",
-  padding: "20px",
-  borderRadius: "12px",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-};
 
 export default App;
