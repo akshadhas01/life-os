@@ -1,176 +1,135 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Tasks from "./components/Tasks";
+import Habits from "./components/Habits";
+import "./App.css";
 
 function App() {
-  const [tasks, setTasks] = useState([]);
-  const [input, setInput] = useState("");
+  const [activePage, setActivePage] = useState("tasks");
 
-  useEffect(() => {
-    const savedTasks = localStorage.getItem("lifeos-tasks");
-
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
+  const renderPage = () => {
+    switch (activePage) {
+      case "tasks":
+        return <Tasks />;
+      case "habits":
+        return <Habits />;
+      default:
+        return <Tasks />;
     }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("lifeos-tasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  const addTask = () => {
-    if (!input.trim()) return;
-
-    setTasks([
-      ...tasks,
-      {
-        id: Date.now(),
-        text: input,
-        completed: false,
-      },
-    ]);
-
-    setInput("");
   };
-
-  const toggleTask = (id) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id
-          ? { ...task, completed: !task.completed }
-          : task
-      )
-    );
-  };
-
-  const deleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
-  };
-
-  const completedTasks = tasks.filter(
-    (task) => task.completed
-  ).length;
 
   return (
     <div
       style={{
         display: "flex",
         height: "100vh",
-        fontFamily: "Arial",
+        fontFamily: "Segoe UI, sans-serif",
       }}
     >
       {/* Sidebar */}
-      <div
+      <aside
         style={{
-          width: "250px",
-          background: "#1f2937",
+          width: "260px",
+          backgroundColor: "#111827",
           color: "white",
-          padding: "20px",
+          padding: "24px",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <h2>Life OS</h2>
+        <h1
+          style={{
+            margin: 0,
+            marginBottom: "8px",
+          }}
+        >
+          Life OS
+        </h1>
 
-        <div style={{ marginTop: "30px" }}>
-          <p>📊 Dashboard</p>
-          <p>✅ Tasks</p>
-          <p>🔥 Habits</p>
-          <p>🎯 Goals</p>
-          <p>📝 Notes</p>
+        <p
+          style={{
+            color: "#9CA3AF",
+            fontSize: "14px",
+            marginBottom: "30px",
+          }}
+        >
+          Personal Productivity Hub
+        </p>
+
+        <button
+          onClick={() => setActivePage("tasks")}
+          style={buttonStyle(activePage === "tasks")}
+        >
+          ✅ Tasks
+        </button>
+
+        <button
+          onClick={() => setActivePage("habits")}
+          style={buttonStyle(activePage === "habits")}
+        >
+          🔥 Habits
+        </button>
+
+        <button
+          disabled
+          style={disabledButtonStyle}
+        >
+          🎯 Goals (Coming Soon)
+        </button>
+
+        <button
+          disabled
+          style={disabledButtonStyle}
+        >
+          📝 Notes (Coming Soon)
+        </button>
+
+        <div
+          style={{
+            marginTop: "auto",
+            color: "#6B7280",
+            fontSize: "12px",
+          }}
+        >
+          Version 1.0
         </div>
-      </div>
+      </aside>
 
-      {/* Main Area */}
-      <div
+      {/* Main Content */}
+      <main
         style={{
           flex: 1,
-          padding: "30px",
-          background: "#f3f4f6",
+          padding: "32px",
+          backgroundColor: "#F3F4F6",
+          overflowY: "auto",
         }}
       >
-        <h1>Task Manager</h1>
-
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            marginTop: "20px",
-          }}
-        >
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Add a task..."
-            style={{
-              padding: "10px",
-              flex: 1,
-            }}
-          />
-
-          <button
-            onClick={addTask}
-            style={{
-              padding: "10px 20px",
-              cursor: "pointer",
-            }}
-          >
-            Add
-          </button>
-        </div>
-
-        <div
-          style={{
-            marginTop: "20px",
-            background: "white",
-            padding: "20px",
-            borderRadius: "12px",
-          }}
-        >
-          <h3>Total Tasks: {tasks.length}</h3>
-          <h3>Completed: {completedTasks}</h3>
-        </div>
-
-        <div style={{ marginTop: "20px" }}>
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              style={{
-                background: "white",
-                padding: "15px",
-                marginBottom: "10px",
-                borderRadius: "10px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div>
-                <input
-                  type="checkbox"
-                  checked={task.completed}
-                  onChange={() => toggleTask(task.id)}
-                />
-
-                <span
-                  style={{
-                    marginLeft: "10px",
-                    textDecoration: task.completed
-                      ? "line-through"
-                      : "none",
-                  }}
-                >
-                  {task.text}
-                </span>
-              </div>
-
-              <button
-                onClick={() => deleteTask(task.id)}
-              >
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+        {renderPage()}
+      </main>
     </div>
   );
 }
+
+const buttonStyle = (active) => ({
+  padding: "12px",
+  marginBottom: "10px",
+  border: "none",
+  borderRadius: "10px",
+  cursor: "pointer",
+  textAlign: "left",
+  backgroundColor: active ? "#374151" : "transparent",
+  color: "white",
+  fontSize: "15px",
+});
+
+const disabledButtonStyle = {
+  padding: "12px",
+  marginBottom: "10px",
+  border: "none",
+  borderRadius: "10px",
+  textAlign: "left",
+  backgroundColor: "transparent",
+  color: "#6B7280",
+  cursor: "not-allowed",
+};
 
 export default App;
