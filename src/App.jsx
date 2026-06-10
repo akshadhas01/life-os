@@ -1,19 +1,35 @@
 import { useState } from "react";
+
+import Dashboard from "./components/Dashboard";
 import Tasks from "./components/Tasks";
 import Habits from "./components/Habits";
+import Goals from "./components/Goals";
+import Notes from "./components/Notes";
+
 import "./App.css";
 
 function App() {
-  const [activePage, setActivePage] = useState("tasks");
+  const [activePage, setActivePage] = useState("dashboard");
 
   const renderPage = () => {
     switch (activePage) {
+      case "dashboard":
+        return <Dashboard />;
+
       case "tasks":
         return <Tasks />;
+
       case "habits":
         return <Habits />;
+
+      case "goals":
+        return <Goals />;
+
+      case "notes":
+        return <Notes />;
+
       default:
-        return <Tasks />;
+        return <Dashboard />;
     }
   };
 
@@ -38,8 +54,8 @@ function App() {
       >
         <h1
           style={{
-            margin: 0,
-            marginBottom: "8px",
+            marginBottom: "6px",
+            fontSize: "28px",
           }}
         >
           Life OS
@@ -48,39 +64,56 @@ function App() {
         <p
           style={{
             color: "#9CA3AF",
-            fontSize: "14px",
             marginBottom: "30px",
+            fontSize: "14px",
           }}
         >
-          Personal Productivity Hub
+          Your personal productivity hub
         </p>
 
         <button
+          className={`sidebar-btn ${
+            activePage === "dashboard" ? "active" : ""
+          }`}
+          onClick={() => setActivePage("dashboard")}
+        >
+          🏠 Dashboard
+        </button>
+
+        <button
+          className={`sidebar-btn ${
+            activePage === "tasks" ? "active" : ""
+          }`}
           onClick={() => setActivePage("tasks")}
-          style={buttonStyle(activePage === "tasks")}
         >
           ✅ Tasks
         </button>
 
         <button
+          className={`sidebar-btn ${
+            activePage === "habits" ? "active" : ""
+          }`}
           onClick={() => setActivePage("habits")}
-          style={buttonStyle(activePage === "habits")}
         >
           🔥 Habits
         </button>
 
         <button
-          disabled
-          style={disabledButtonStyle}
+          className={`sidebar-btn ${
+            activePage === "goals" ? "active" : ""
+          }`}
+          onClick={() => setActivePage("goals")}
         >
-          🎯 Goals (Coming Soon)
+          🎯 Goals
         </button>
 
         <button
-          disabled
-          style={disabledButtonStyle}
+          className={`sidebar-btn ${
+            activePage === "notes" ? "active" : ""
+          }`}
+          onClick={() => setActivePage("notes")}
         >
-          📝 Notes (Coming Soon)
+          📝 Notes
         </button>
 
         <div
@@ -90,7 +123,7 @@ function App() {
             fontSize: "12px",
           }}
         >
-          Version 1.0
+          Life OS v1.0
         </div>
       </aside>
 
@@ -108,28 +141,5 @@ function App() {
     </div>
   );
 }
-
-const buttonStyle = (active) => ({
-  padding: "12px",
-  marginBottom: "10px",
-  border: "none",
-  borderRadius: "10px",
-  cursor: "pointer",
-  textAlign: "left",
-  backgroundColor: active ? "#374151" : "transparent",
-  color: "white",
-  fontSize: "15px",
-});
-
-const disabledButtonStyle = {
-  padding: "12px",
-  marginBottom: "10px",
-  border: "none",
-  borderRadius: "10px",
-  textAlign: "left",
-  backgroundColor: "transparent",
-  color: "#6B7280",
-  cursor: "not-allowed",
-};
 
 export default App;
